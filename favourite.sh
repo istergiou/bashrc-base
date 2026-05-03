@@ -10,6 +10,8 @@
 #   favourite run <name>             Run ~/.config/favourite.d/<name>
 # ---------------------------------------------------------------------------
 
+mkdir -p "${HOME}/.config/favourite.d"
+
 # -- helpers ----------------------------------------------------------------
 
 _favourite_files() {

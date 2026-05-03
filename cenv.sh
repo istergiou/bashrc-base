@@ -10,6 +10,8 @@
 #   cenv list          List available environment files
 # ---------------------------------------------------------------------------
 
+mkdir -p "${HOME}/.config/env.d"
+
 # -- helpers ----------------------------------------------------------------
 
 _cenv_files() {
@@ -19,7 +21,7 @@ _cenv_files() {
 _cenv_usage() {
   cat <<'EOF'
 Usage: cenv <command>
-  set <name>    Source ~/bin/env.d/<name>
+  set <name>    Source ~/.config/env.d/<name>
   print         Print all env.d variables and their current values
   print last    Print variables from the last sourced env
   list          List available environment files
@@ -35,7 +37,7 @@ _cenv_set() {
   fi
   export ENV_SET="$name"
   if [[ ! -f "${HOME}/.config/env.d/${name}" ]]; then
-    echo "Error: env settings not found: ~/bin/env.d/${name}"; return 1
+    echo "Error: env settings not found: ~/.config/env.d/${name}"; return 1
   fi
   source "${HOME}/.config/env.d/${name}"
   echo "set env to ${name}"
