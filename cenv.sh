@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 # ---------------------------------------------------------------------------
-# cenv — unified CLI for managing environment files from ~/bin/env.d/
+# cenv — unified CLI for managing environment files from ~/.config/env.d/
 #
 # Usage:
-#   cenv set <name>    Source ~/bin/env.d/<name>
+#   cenv set <name>    Source ~/.config/env.d/<name>
 #   cenv print         Print all env.d variables and their current values
 #   cenv print last    Print variables from the last sourced env
 #   cenv list          List available environment files
