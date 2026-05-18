@@ -9,20 +9,21 @@ Each file under `~/.config/env.d/` is a shell script that exports environment va
 ## Usage
 
 ```
-cenv set <name>    Source ~/.config/env.d/<name> into the current shell
-cenv list          List available environment files
-cenv print         Print all exported variables defined across every env file, with their current values
-cenv print last    Print only the variables from the last activated env file
+cenv set <name> [name2 ...]    Source one or more ~/.config/env.d/<name> files into the current shell
+cenv list                      List available environment files
+cenv print                     Print all exported variables defined across every env file, with their current values
+cenv print last                Print only the variables from the last activated env(s)
 ```
 
 ## Commands
 
-### `cenv set <name>`
+### `cenv set <name> [name2 ...]`
 
-Sources `~/.config/env.d/<name>` into the current shell session, making its exports available as environment variables. Sets `ENV_SET=<name>` so the active environment is tracked.
+Sources one or more `~/.config/env.d/<name>` files into the current shell session, making their exports available as environment variables. All named files are validated before any are sourced. Sets `ENV_SET` to the space-separated list of activated names.
 
 ```bash
 cenv set staging
+cenv set base staging
 ```
 
 ### `cenv list`
@@ -49,10 +50,12 @@ cenv print
 
 ### `cenv print last`
 
-Like `cenv print`, but restricted to variables declared in the last file activated with `cenv set`. Requires that `cenv set` has been called at least once in the session.
+Like `cenv print`, but restricted to variables declared in the env(s) activated by the last `cenv set` call. Requires that `cenv set` has been called at least once in the session.
 
 ```bash
 cenv print last
+# env: base
+#   DATABASE_URL=postgres://localhost/mydb
 # env: staging
 #   AWS_PROFILE=staging
 #   REGION=eu-west-1

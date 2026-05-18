@@ -21,26 +21,30 @@ _cenv_files() {
 _cenv_usage() {
   cat <<'EOF'
 Usage: cenv <command>
-  set <name>    Source ~/.config/env.d/<name>
-  print         Print all env.d variables and their current values
-  print last    Print variables from the last sourced env
-  list          List available environment files
+  set <name> [name2 ...]    Source one or more ~/.config/env.d/<name> files
+  print                     Print all env.d variables and their current values
+  print last                Print variables from the last sourced env(s)
+  list                      List available environment files
 EOF
 }
 
 # -- subcommands ------------------------------------------------------------
 
 _cenv_set() {
-  local name="$1"
-  if [[ -z "$name" ]]; then
-    echo "Usage: cenv set <name>"; return 1
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: cenv set <name> [name2 ...]"; return 1
   fi
-  export ENV_SET="$name"
-  if [[ ! -f "${HOME}/.config/env.d/${name}" ]]; then
-    echo "Error: env settings not found: ~/.config/env.d/${name}"; return 1
-  fi
-  source "${HOME}/.config/env.d/${name}"
-  echo "set env to ${name}"
+  local name
+  for name in "$@"; do
+    if [[ ! -f "${HOME}/.config/env.d/${name}" ]]; then
+      echo "Error: env settings not found: ~/.config/env.d/${name}"; return 1
+    fi
+  done
+  for name in "$@"; do
+    source "${HOME}/.config/env.d/${name}"
+    echo "set env to ${name}"
+  done
+  export ENV_SET="$*"
 }
 
 _cenv_print() {
@@ -62,10 +66,13 @@ _cenv_print_last() {
   if [[ -z "$ENV_SET" ]]; then
     echo "No env set"; return 1
   fi
-  local file="${HOME}/.config/env.d/${ENV_SET}"
-  echo "env: ${ENV_SET}"
-  grep -oP '(?<=export )\w+' "$file" | while read -r var; do
-    echo "  ${var}=${!var}"
+  local name
+  for name in $ENV_SET; do
+    local file="${HOME}/.config/env.d/${name}"
+    echo "env: ${name}"
+    grep -oP '(?<=export )\w+' "$file" | while read -r var; do
+      echo "  ${var}=${!var}"
+    done
   done
 }
 
@@ -96,10 +103,17 @@ _cenv_completions() {
 
   case $cword in
     1) COMPREPLY=($(compgen -W "set print list" -- "$cur")) ;;
-    2)
+    *)
       case "${words[1]}" in
-        set)    COMPREPLY=($(compgen -W "$(_cenv_files)" -- "$cur")) ;;
-        print)  COMPREPLY=($(compgen -W "last" -- "$cur")) ;;
+        set)
+          local all i name
+          all=$(_cenv_files)
+          for ((i=2; i<cword; i++)); do
+            all=$(echo "$all" | grep -v "^${words[i]}$")
+          done
+          COMPREPLY=($(compgen -W "$all" -- "$cur")) ;;
+        print)
+          [[ $cword -eq 2 ]] && COMPREPLY=($(compgen -W "last" -- "$cur")) ;;
       esac ;;
   esac
 }
